@@ -52,6 +52,11 @@ body{margin:0;padding:24px 14px 40px;background:var(--bg);color:var(--ink);
 
   <div class="tip">
     <b>Su iPhone:</b> tocca <b>Condividi</b> e poi <b>Aggiungi alla schermata Home</b>. Le pagine funzionano anche senza rete e i dati restano salvati sul telefono.
+    <div style="margin-top:10px">
+      <button onclick="ripara()" style="background:#fff;border:1px solid #fed7aa;color:#9a3412;font-size:11.5px;font-weight:700;padding:7px 11px;border-radius:8px;cursor:pointer">
+        &#128295; Pagine che non si aprono? Ripristina
+      </button>
+    </div>
   </div>
 
   <div class="credit">creato da GenGioIA per Sole 365 G.C.-G.D.R.</div>
@@ -61,6 +66,21 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('sw.js').catch(function(){});
   });
+}
+/* Ripristino: svuota la cache, rimuove il service worker e ricarica */
+function ripara(){
+  var fine = function(){ location.reload(true); };
+  try{
+    if (window.caches && caches.keys){
+      caches.keys().then(function(k){ return Promise.all(k.map(function(n){ return caches.delete(n); })); })
+        .catch(function(){});
+    }
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
+      navigator.serviceWorker.getRegistrations().then(function(rs){
+        return Promise.all(rs.map(function(r){ return r.unregister(); }));
+      }).then(fine).catch(fine);
+    } else fine();
+  }catch(e){ fine(); }
 }
 </script>
 </body>

@@ -71,3 +71,23 @@ Se carichi da GitHub:
 VERIFICA
 Aperto l'indirizzo devi vedere il menu con i due riquadri
 "Check List Qualita' & Reparti" e "Segnalazione Giornaliera".
+
+
+---------------------------------------------------------------
+ERR_FAILED / pagina non raggiungibile
+---------------------------------------------------------------
+Causa: la vecchia versione di sw.js (il file che gestisce il
+funzionamento senza rete) in caso di errore rispondeva con un valore
+vuoto, e il browser lo traduceva in ERR_FAILED. Con il primo caricamento
+andato in 404 la memoria era rimasta vuota e bloccava le pagine.
+
+COSA FARE
+1. Ricarica su Vercel questi file aggiornati (sw.js e index.html sono
+   cambiati; vercel.json e' stato eliminato).
+2. Sui telefoni o computer che avevano gia' aperto il sito rotto:
+   apri la pagina principale e premi il pulsante
+   "Pagine che non si aprono? Ripristina".
+   Svuota la memoria, rimuove il vecchio gestore e ricarica.
+   In alternativa: Chrome > tre puntini > Cronologia > Cancella dati
+   di navigazione > Immagini e file memorizzati nella cache.
+   Su iPhone: Impostazioni > Safari > Cancella dati siti web.
