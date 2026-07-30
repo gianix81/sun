@@ -1,0 +1,12 @@
+{
+  "name": "Sole 365 – Strumenti Filiale",
+  "short_name": "Sole 365",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#eef1f6",
+  "theme_color": "#0b2545",
+  "lang": "it",
+  "icons": [
+    { "src": "icona.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b2545">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<title>Segnalazione Giornaliera – Filiale</title>
+<style>
+:root{
+  --brand-900:#0b2545; --brand-700:#13315c; --brand-500:#2563eb; --brand-050:#eef4ff;
+  --ok:#15803d; --ko:#dc2626; --warn:#c2410c; --warn-bg:#fff7ed;
+  --line:#dde3ec; --ink:#0f172a; --ink-soft:#475569; --bg:#eef1f6;
+  --radius:14px; --shadow:0 1px 2px rgba(15,23,42,.06), 0 8px 24px -12px rgba(15,23,42,.25);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;padding:16px 12px 40px;background:var(--bg);color:var(--ink);
+  font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.container{max-width:820px;margin:0 auto}
+
+/* HERO */
+.hero{
+  background:linear-gradient(135deg,var(--brand-900) 0%,var(--brand-700) 45%,var(--brand-500) 100%);
+  color:#fff;border-radius:var(--radius);padding:18px 20px 20px;box-shadow:var(--shadow);
+  position:relative;overflow:hidden;
+}
+.hero::after{content:"";position:absolute;right:-70px;top:-80px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.07)}
+.hero-inner{position:relative;z-index:1}
+.badge-ver{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.5px;background:rgba(255,255,255,.18);padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.28);margin-bottom:10px}
+.hero h1{margin:0;font-weight:700;line-height:1.25;font-size:clamp(18px,5.2vw,24px)}
+.hero p{margin:6px 0 0;font-size:13px;line-height:1.5;opacity:.85;max-width:58ch}
+
+/* BARRA FISSA */
+.stickyhead{
+  position:sticky;top:0;z-index:50;margin-top:16px;
+  background:rgba(255,255,255,.97);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 6px 18px -10px rgba(15,23,42,.35);
+  padding:9px 10px;display:flex;align-items:center;gap:8px;
+}
+.stato{flex:1;min-width:0;font-size:12px;font-weight:700;color:var(--brand-700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qa{display:flex;gap:5px;flex:0 0 auto}
+.qa button{width:38px;height:38px;border:none;border-radius:9px;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;padding:0}
+.qa button span{display:none;font-size:13px;font-weight:700}
+.qa button:active{transform:scale(.94)}
+@media(min-width:600px){.qa button{width:auto;padding:0 14px}.qa button span{display:inline}}
+.b-copy{background:var(--brand-500)}
+.b-wa{background:#16a34a}
+
+/* SEZIONI */
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-top:16px;overflow:hidden}
+.card-head{
+  display:flex;align-items:center;gap:9px;padding:12px 16px;
+  background:linear-gradient(135deg,var(--brand-700),var(--brand-500));color:#fff;
+}
+.card-head .n{
+  width:23px;height:23px;flex:0 0 auto;border-radius:50%;background:rgba(255,255,255,.22);
+  border:1px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;
+  font-size:11.5px;font-weight:800;
+}
+.card-head h2{margin:0;font-size:14px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.card-body{padding:16px}
+
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.wide{grid-column:1/-1}
+label{display:block;font-size:10.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:var(--brand-700);margin-bottom:6px}
+input,select,textarea{
+  width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;
+  font-size:15px;background:#fbfcfe;color:var(--ink);font-family:inherit;
+}
+select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%23475569' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand-500);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.14)}
+.riga-scarico{display:grid;grid-template-columns:1fr 108px;gap:8px;align-items:end;margin-bottom:10px}
+.riga-scarico label{margin-bottom:6px}
+
+details.opz{border-top:1px solid var(--line)}
+details.opz summary{
+  cursor:pointer;padding:13px 16px;font-size:12.5px;font-weight:700;color:var(--brand-700);
+  background:var(--brand-050);list-style:none;
+}
+details.opz summary::-webkit-details-marker{display:none}
+details.opz summary::before{content:"▸ ";font-size:11px}
+details.opz[open] summary::before{content:"▾ "}
+
+/* ANTEPRIMA */
+textarea.prev{height:80px;font-size:13.5px}
+textarea.out{height:230px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;background:#f8fafc}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.btn{padding:13px;border:none;border-radius:10px;font-size:14px;font-weight:700;color:#fff;cursor:pointer}
+.btn:active{transform:scale(.97)}
+
+/* REGOLE */
+.rules{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.rules summary{cursor:pointer;padding:13px 16px;font-size:13px;font-weight:700;color:var(--brand-700);background:var(--brand-050);list-style:none}
+.rules summary::-webkit-details-marker{display:none}
+.rules-body{padding:14px 16px;font-size:13px;line-height:1.65;color:var(--ink-soft)}
+.rules-body ol{margin:8px 0 0;padding-left:20px}
+.rules-body b{color:var(--ink)}
+
+/* SALVATAGGIO */
+.saveline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--ink-soft)}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+.btn-mini{background:#fff;border:1px solid var(--line);color:var(--brand-700);font-size:11.5px;font-weight:700;padding:7px 11px;border-radius:8px;cursor:pointer}
+.btn-reset{background:#fff;border:1px solid #fecaca;color:var(--ko);font-size:11.5px;font-weight:700;padding:7px 11px;border-radius:8px;cursor:pointer}
+.warnbox{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.5;background:var(--warn-bg);border:1px solid #fed7aa;color:#9a3412}
+
+/* MODALE */
+.modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;inset:0;z-index:200;display:none;background:rgba(15,23,42,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:480px;max-height:86vh;display:flex;flex-direction:column;box-shadow:0 24px 60px -20px rgba(15,23,42,.6)}
+.modal h3{margin:0;padding:16px 18px;font-size:15.5px;border-bottom:1px solid var(--line);line-height:1.35}
+.modal-body{padding:16px 18px;overflow-y:auto;font-size:13.5px;line-height:1.6;color:var(--ink-soft)}
+.modal-actions{display:flex;gap:8px;padding:14px 18px;border-top:1px solid var(--line)}
+.modal-actions button{flex:1;padding:12px;border:none;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer}
+.m-primary{background:var(--brand-500);color:#fff}
+.m-warn{background:#c2410c;color:#fff}
+.m-ghost{background:#eef2f7;color:var(--ink-soft)}
+
+.fallback{margin-top:16px;background:#fff;border:1px solid #fed7aa;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.fallback summary{cursor:pointer;padding:13px 16px;font-size:13px;font-weight:700;color:#9a3412;background:var(--warn-bg);list-style:none}
+.fallback summary::-webkit-details-marker{display:none}
+.fallback .fb-body{padding:16px}
+.fallback p{margin:0 0 12px;font-size:12.5px;line-height:1.6;color:var(--ink-soft)}
+.fallback textarea{height:300px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace}
+.fallback button{width:100%;margin-top:12px;padding:14px;border:none;border-radius:10px;background:#16a34a;color:#fff;font-size:14.5px;font-weight:700;cursor:pointer}
+.credit{text-align:center;font-size:7.5px;letter-spacing:.3px;color:#cbd2dc;margin-top:18px;user-select:none}
+
+@media print{
+  @page{size:A4 portrait;margin:10mm}
+  body{background:#fff;padding:0;font-size:9pt}
+  .stickyhead,.actions,.rules,.saveline,.warnbox,.modal-bg{display:none !important}
+  .hero{background:#fff !important;color:#000 !important;border-bottom:2pt solid #000;border-radius:0;box-shadow:none;padding:0 0 6pt}
+  .hero::after{display:none}
+  .card{box-shadow:none;border:1pt solid #999;border-radius:0;page-break-inside:avoid}
+  .card-head{background:#dde3ec !important;color:#000 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-inner">
+      <span class="badge-ver">Segnalazione &middot; v2</span>
+      <h1>Segnalazione Giornaliera</h1>
+      <p>Compila i campi: la pagina prepara un unico messaggio con tutte le voci richieste dal Capo Area.</p>
+    </div>
+  </div>
+
+  <noscript>
+    <div class="warnbox">
+      <b>&#9888;&#65039; JavaScript disattivato</b> &mdash; i campi si compilano ma il messaggio non viene composto.
+      Apri il file con <b>Chrome</b> o <b>Safari</b>.
+    </div>
+  </noscript>
+
+  <div class="stickyhead">
+    <span class="stato" id="stato">Compila i campi</span>
+    <div class="qa">
+      <button class="b-copy" title="Copia messaggio" onclick="copia()">&#128203;<span>Copia</span></button>
+      <button class="b-wa" title="Invia su WhatsApp" onclick="wa()">&#128172;<span>WhatsApp</span></button>
+    </div>
+  </div>
+
+  <!-- FILIALE -->
+  <section class="card">
+    <header class="card-head"><span class="n">&#9679;</span><h2>Filiale</h2></header>
+    <div class="card-body">
+      <div class="grid">
+        <div>
+          <label for="data">Data</label>
+          <input type="date" id="data">
+        </div>
+        <div>
+          <label for="filiale">Codice</label>
+          <input list="l-fil" id="filiale" placeholder="566520" inputmode="numeric">
+          <datalist id="l-fil">
+            <option value="566520">Figliola</option>
+            <option value="566528">Soccavo</option>
+            <option value="566530">Colli Aminei</option>
+            <option value="566533">Libertà</option>
+            <option value="566552">Portici Garibaldi</option>
+            <option value="566565">Chiaiano</option>
+            <option value="566578">566578</option>
+            <option value="566588">566588</option>
+          </datalist>
+        </div>
+        <div>
+          <label for="nomefil">Nome</label>
+          <input type="text" id="nomefil" placeholder="Figliola">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1 MATTINO -->
+  <section class="card">
+    <header class="card-head"><span class="n">1</span><h2>Situazione al mattino</h2></header>
+    <div class="card-body">
+      <div class="grid">
+        <div>
+          <label for="m-ditta">Ditta</label>
+          <input list="l-ditte" id="m-ditta" placeholder="Mission">
+          <datalist id="l-ditte"><option value="Mission"><option value="Transfer"><option value="Mission e Transfer"></datalist>
+        </div>
+        <div>
+          <label for="m-stato">Ditta &mdash; stato</label>
+          <select id="m-stato">
+            <option value="">—</option>
+            <option value="ha terminato ed è uscita dal punto vendita">ha terminato ed è uscita</option>
+            <option value="è ancora in filiale">è ancora in filiale</option>
+            <option value="sta lasciando il punto vendita">sta uscendo</option>
+            <option value="non è presente">non è presente</option>
+          </select>
+        </div>
+        <div>
+          <label for="m-ora">Ora</label>
+          <input type="time" id="m-ora">
+        </div>
+        <div>
+          <label for="m-lavori">Caricamento e allineamento</label>
+          <select id="m-lavori">
+            <option value="">—</option>
+            <option>completati</option>
+            <option>in corso</option>
+            <option>da completare</option>
+          </select>
+        </div>
+        <div>
+          <label for="m-pedane">Pedane da caricare</label>
+          <input type="number" id="m-pedane" min="0" inputmode="numeric" placeholder="0">
+        </div>
+        <div>
+          <label for="m-disserv">Disservizi notte</label>
+          <select id="m-disserv"><option value="">—</option><option value="no">nessuno</option><option value="si">sì</option></select>
+        </div>
+        <div class="wide">
+          <label for="m-note">Note</label>
+          <input type="text" id="m-note" placeholder="Es. corsia bibite e latte da allineare">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 SCARICHI -->
+  <section class="card">
+    <header class="card-head"><span class="n">2</span><h2>Scarichi</h2></header>
+    <div class="card-body">
+      <div class="riga-scarico">
+        <div>
+          <label for="s-secchi">Secchi</label>
+          <select id="s-secchi"><option value="">—</option><option>ricevuto</option><option>parziale</option><option>in attesa</option><option>non pervenuto</option></select>
+        </div>
+        <div><label for="s-secchi-ora">Ora</label><input type="time" id="s-secchi-ora"></div>
+      </div>
+      <div class="riga-scarico">
+        <div>
+          <label for="s-freschi">Freschi</label>
+          <select id="s-freschi"><option value="">—</option><option>ricevuto</option><option>parziale</option><option>in attesa</option><option>non pervenuto</option></select>
+        </div>
+        <div><label for="s-freschi-ora">Ora</label><input type="time" id="s-freschi-ora"></div>
+      </div>
+      <div class="riga-scarico">
+        <div>
+          <label for="s-surg">Surgelati</label>
+          <select id="s-surg"><option value="">—</option><option>ricevuto</option><option>parziale</option><option>in attesa</option><option>non pervenuto</option></select>
+        </div>
+        <div><label for="s-surg-ora">Ora</label><input type="time" id="s-surg-ora"></div>
+      </div>
+      <div>
+        <label for="s-note">Anomalie</label>
+        <input type="text" id="s-note" placeholder="Es. secondo camion arrivato alle 2, fuori orario">
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 RESA -->
+  <section class="card">
+    <header class="card-head"><span class="n">3</span><h2>Colli di resa</h2></header>
+    <div class="card-body">
+      <div class="grid">
+        <div><label for="r-sala">Sala</label><input type="number" id="r-sala" min="0" inputmode="numeric" placeholder="0"></div>
+        <div><label for="r-bls">BLS</label><input type="number" id="r-bls" min="0" inputmode="numeric" placeholder="0"></div>
+        <div><label for="r-surg">Surgelati</label><input type="number" id="r-surg" min="0" inputmode="numeric" placeholder="0"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 INTEGRATI -->
+  <section class="card">
+    <header class="card-head"><span class="n">4</span><h2>Ordini integrati</h2></header>
+    <div class="card-body">
+      <div class="grid">
+        <div><label for="i-tot">Colli totali</label><input type="number" id="i-tot" min="0" inputmode="numeric" placeholder="0"></div>
+        <div><label for="i-fb">Di cui FB</label><input type="number" id="i-fb" min="0" inputmode="numeric" placeholder="0"></div>
+        <div><label for="i-acqua">Di cui acqua</label><input type="number" id="i-acqua" min="0" inputmode="numeric" placeholder="0"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 MEZZI -->
+  <section class="card">
+    <header class="card-head"><span class="n">5</span><h2>File riempimento mezzi</h2></header>
+    <div class="card-body">
+      <div class="grid">
+        <div>
+          <label for="f-stato">Stato</label>
+          <select id="f-stato"><option value="">—</option><option>ok</option><option>da completare</option><option>non compilato</option></select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROSPETTO COLLI (facoltativo) -->
+  <section class="card">
+    <details class="opz">
+      <summary>Prospetto colli ordini &mdash; solo quando richiesto</summary>
+      <div class="card-body">
+        <div class="grid">
+          <div><label for="c-sala-asr">Sala ASR</label><input type="number" id="c-sala-asr" min="0" inputmode="numeric" placeholder="0"></div>
+          <div><label for="c-sala-man">Sala manuale</label><input type="number" id="c-sala-man" min="0" inputmode="numeric" placeholder="0"></div>
+          <div><label for="c-acqua">Acqua</label><input type="number" id="c-acqua" min="0" inputmode="numeric" placeholder="0"></div>
+          <div><label for="c-bls-asr">BLS ASR</label><input type="number" id="c-bls-asr" min="0" inputmode="numeric" placeholder="0"></div>
+          <div><label for="c-bls-man">BLS manuale</label><input type="number" id="c-bls-man" min="0" inputmode="numeric" placeholder="0"></div>
+          <div><label for="c-surg-asr">Surgelati ASR</label><input type="number" id="c-surg-asr" min="0" inputmode="numeric" placeholder="0"></div>
+          <div><label for="c-surg-man">Surgelati manuale</label><input type="number" id="c-surg-man" min="0" inputmode="numeric" placeholder="0"></div>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- MESSAGGIO -->
+  <section class="card">
+    <header class="card-head"><span class="n">&#9993;</span><h2>Messaggio da inviare</h2></header>
+    <div class="card-body">
+      <div>
+        <label for="prev">Messaggio della filiale precedente (facoltativo)</label>
+        <textarea class="prev" id="prev" placeholder="Incolla qui il messaggio ricevuto nel gruppo: il tuo verrà aggiunto sotto."></textarea>
+      </div>
+      <div style="margin-top:14px">
+        <label for="out">Testo completo</label>
+        <textarea class="out" id="out" readonly></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn b-copy" onclick="copia()">&#128203; Copia</button>
+        <button class="btn b-wa" onclick="wa()">&#128172; WhatsApp</button>
+      </div>
+
+      <div class="saveline">
+        <span id="save-state">&#128190; Salvataggio automatico attivo</span>
+        <div class="tools">
+          <button class="btn-mini" onclick="esportaDati()">&#11015; Esporta</button>
+          <button class="btn-mini" onclick="document.getElementById('file-import').click()">&#11014; Importa</button>
+          <button class="btn-reset" onclick="nuovoGiorno()">&#128465; Nuovo giorno</button>
+        </div>
+      </div>
+      <input type="file" id="file-import" accept=".json,application/json" style="display:none" onchange="importaDati(this)">
+      <div class="warnbox" id="warnbox" style="display:none"></div>
+    </div>
+  </section>
+
+  <details class="rules">
+    <summary>&#128220; Cosa chiede il Capo Area</summary>
+    <div class="rules-body">
+      Ogni filiale <b>copia il messaggio della precedente e incolla il proprio sotto</b>, con il puntino iniziale che identifica la filiale.
+      <ol>
+        <li><b>Situazione al mattino</b>: disservizi provider nella notte e stato della filiale dopo il commissionamento.</li>
+        <li><b>Scarichi</b>: secchi, freschi e surgelati ricevuti.</li>
+        <li><b>Colli di resa</b>.</li>
+        <li><b>Ordini integrati</b> compresi FB e acqua, con i colli d'acqua tra parentesi.</li>
+        <li><b>File riempimento mezzi</b>.</li>
+      </ol>
+      Il prospetto colli ordini (sala, BLS e surgelati distinti fra ASR e manuale) va inviato solo quando richiesto.
+    </div>
+  </details>
+
+  <details class="fallback">
+    <summary>&#128241; Modalità senza JavaScript &mdash; usala se la pagina non compila da sola</summary>
+    <div class="fb-body">
+      <p>Se apri il file direttamente sull'iPhone, l'anteprima blocca le funzioni automatiche.
+      Qui sotto trovi lo <b>schema già pronto</b>: sostituisci i puntini con i tuoi dati, poi premi il pulsante verde.
+      Questo riquadro funziona <b>anche senza JavaScript</b>.</p>
+      <form action="https://api.whatsapp.com/send" method="get" target="_blank">
+        <textarea name="text">&#8226; Filiale ...... — ../..
+1. Mattino: ditta ...... ha terminato / è ancora in filiale alle ......, caricamento e allineamento completati / in corso, nessun disservizio provider nella notte.
+2. Scarichi: secchi ...... ore ......; freschi ...... ore ......; surgelati ...... ore ......
+3. Resa: sala ...... , BLS ...... , surgelati ...... — totale ...... colli.
+4. Ordini integrati: ...... colli, di cui FB ...... e acqua (...... colli).
+5. File riempimento mezzi: ok.</textarea>
+        <button type="submit">&#128172; Apri WhatsApp con questo testo</button>
+      </form>
+    </div>
+  </details>
+
+  <div class="credit">creato da GenGioIA per Sole 365 G.C.-G.D.R.</div>
+</div>
+
+<div class="modal-bg" id="modal" onclick="if(event.target===this)chiudiModal()">
+  <div class="modal">
+    <h3 id="modal-title"></h3>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<script>
+function g(id){ const e = document.getElementById(id); return e ? String(e.value).trim() : ''; }
+function oggiISO(){ const d = new Date(), p = n => (n < 10 ? '0' : '') + n; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+function ora(id){ const v = g(id); return v ? v.replace(':', '.') : ''; }
+function dataIT(){
+  const v = g('data'); if (!v) return '';
+  const p = v.split('-'); return p.length === 3 ? p[2]+'/'+p[1] : v;
+}
+try { document.getElementById('data').value = oggiISO(); } catch(e){}
+
+/* ---------- MESSAGGIO UNICO ---------- */
+function testoMio(){
+  const cod = g('filiale'), nome = g('nomefil'), d = dataIT();
+  const r = ['• Filiale ' + ((cod + ' ' + nome).trim() || '___') + (d ? ' — ' + d : '')];
+
+  /* 1 mattino */
+  const p1 = [];
+  const ditta = g('m-ditta'), stato = g('m-stato'), o = ora('m-ora');
+  if (ditta || stato) p1.push((ditta || 'Ditta') + (stato ? ' ' + stato : '') + (o ? ' alle ' + o : ''));
+  if (g('m-lavori'))  p1.push('caricamento e allineamento ' + g('m-lavori'));
+  const ped = g('m-pedane');
+  if (ped && ped !== '0') p1.push('restano ' + ped + ' pedane da caricare');
+  const dis = g('m-disserv');
+  if (dis === 'no') p1.push('nessun disservizio provider nella notte');
+  if (dis === 'si') p1.push('disservizio provider nella notte');
+  if (g('m-note'))  p1.push(g('m-note'));
+  r.push('1. Mattino: ' + (p1.length ? p1.join(', ') + '.' : '—'));
+
+  /* 2 scarichi */
+  const p2 = [];
+  [['secchi','s-secchi','s-secchi-ora'],['freschi','s-freschi','s-freschi-ora'],['surgelati','s-surg','s-surg-ora']]
+    .forEach(x => { const st = g(x[1]); if (st) p2.push(x[0] + ' ' + st + (ora(x[2]) ? ' ore ' + ora(x[2]) : '')); });
+  if (g('s-note')) p2.push(g('s-note'));
+  r.push('2. Scarichi: ' + (p2.length ? p2.join('; ') + '.' : '—'));
+
+  /* 3 resa */
+  const rs = g('r-sala'), rb = g('r-bls'), rg = g('r-surg');
+  const p3 = [];
+  if (rs !== '') p3.push('sala ' + rs);
+  if (rb !== '') p3.push('BLS ' + rb);
+  if (rg !== '') p3.push('surgelati ' + rg);
+  let tot = (Number(rs)||0) + (Number(rb)||0) + (Number(rg)||0);
+  r.push('3. Resa: ' + (p3.length ? p3.join(', ') + ' — totale ' + tot + ' colli.' : '—'));
+
+  /* 4 integrati */
+  const it = g('i-tot'), ifb = g('i-fb'), iac = g('i-acqua');
+  if (it === '' && ifb === '' && iac === ''){
+    r.push('4. Ordini integrati: —');
+  } else {
+    let s = '4. Ordini integrati: ' + (it === '' ? '0' : it) + ' colli';
+    const dett = [];
+    if (ifb !== '') dett.push('FB ' + ifb);
+    if (iac !== '') dett.push('acqua (' + iac + ' colli)');
+    if (dett.length) s += ', di cui ' + dett.join(' e ');
+    r.push(s + '.');
+  }
+
+  /* 5 mezzi */
+  r.push('5. File riempimento mezzi: ' + (g('f-stato') || '—') + '.');
+
+  /* prospetto colli, solo se compilato */
+  const cc = ['c-sala-asr','c-sala-man','c-acqua','c-bls-asr','c-bls-man','c-surg-asr','c-surg-man'];
+  if (cc.some(id => g(id) !== '')){
+    const n = id => (g(id) === '' ? '0' : g(id));
+    r.push('');
+    r.push('Colli ordini:');
+    r.push('Sala ASR ' + n('c-sala-asr') + ' — manuale ' + n('c-sala-man'));
+    r.push('Acqua ' + n('c-acqua'));
+    r.push('BLS ASR ' + n('c-bls-asr') + ' — manuale ' + n('c-bls-man'));
+    r.push('Surgelati ASR ' + n('c-surg-asr') + ' — manuale ' + n('c-surg-man'));
+  }
+
+  return r.join('\n');
+}
+
+function testoCompleto(){
+  const prec = (document.getElementById('prev').value || '').replace(/\s+$/, '');
+  const mio = testoMio();
+  return prec ? prec + '\n\n' + mio : mio;
+}
+
+function componi(){
+  document.getElementById('out').value = testoCompleto();
+  const mancano = [];
+  if (!g('filiale') && !g('nomefil')) mancano.push('filiale');
+  if (!g('m-ditta') && !g('m-stato') && !g('m-lavori')) mancano.push('mattino');
+  if (!g('s-secchi') && !g('s-freschi') && !g('s-surg')) mancano.push('scarichi');
+  if (g('r-sala') === '' && g('r-bls') === '' && g('r-surg') === '') mancano.push('resa');
+  if (g('i-tot') === '' && g('i-acqua') === '') mancano.push('integrati');
+  if (!g('f-stato')) mancano.push('mezzi');
+  const st = document.getElementById('stato');
+  if (!mancano.length){ st.innerHTML = '&#9989; Messaggio pronto'; st.style.color = '#15803d'; }
+  else { st.textContent = 'Da compilare: ' + mancano.join(', '); st.style.color = '#c2410c'; }
+  salvaDifferito();
+}
+
+/* ---------- MODALE ---------- */
+function apriModal(t, c, az){
+  document.getElementById('modal-title').innerHTML = t;
+  document.getElementById('modal-body').innerHTML = c;
+  const box = document.getElementById('modal-actions');
+  box.innerHTML = '';
+  az.forEach(a => {
+    const b = document.createElement('button');
+    b.className = a.cls || 'm-ghost'; b.textContent = a.label;
+    b.onclick = () => { chiudiModal(); if (a.fn) setTimeout(a.fn, 60); };
+    box.appendChild(b);
+  });
+  document.getElementById('modal').classList.add('show');
+}
+function chiudiModal(){ document.getElementById('modal').classList.remove('show'); }
+function avviso(t, c){ apriModal(t, c, [{label:'Ho capito', cls:'m-primary'}]); }
+
+/* ---------- COPIA E INVIO ---------- */
+function copia(){
+  const ta = document.getElementById('out'), t = ta.value;
+  if (!t.trim()) return;
+  ta.removeAttribute('readonly');
+  ta.focus(); ta.select(); ta.setSelectionRange(0, 999999);
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch(e){}
+  if (navigator.clipboard){ try { navigator.clipboard.writeText(t); ok = true; } catch(e){} }
+  ta.setAttribute('readonly','readonly');
+  if (window.getSelection) window.getSelection().removeAllRanges();
+  avviso(ok ? '&#9989; Messaggio copiato' : '&#9888;&#65039; Copia non riuscita',
+    ok ? 'Apri il gruppo e incollalo.' : 'Seleziona il testo nel riquadro e copialo a mano.');
+}
+function wa(){
+  const t = document.getElementById('out').value;
+  if (!t.trim()) return;
+  let w = null;
+  try { w = window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(t), '_blank'); } catch(e){}
+  if (!w) setTimeout(copia, 300);
+}
+
+/* ---------- SALVATAGGIO ---------- */
+const STORE_KEY = 'segnalazione-filiale-v2';
+const storageOk = (() => { try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; } catch(e){ return false; } })();
+let timerSalva = null;
+function campi(){ const o = []; document.querySelectorAll('input,select,textarea').forEach(e => { if (e.id && e.type !== 'file' && !e.readOnly) o.push(e); }); return o; }
+function statoAttuale(){ const d = {ts:Date.now(), v:{}}; campi().forEach(e => d.v[e.id] = e.value); return d; }
+function salvaDifferito(){ if (!storageOk) return; clearTimeout(timerSalva); timerSalva = setTimeout(salva, 400); }
+function salva(){
+  if (!storageOk) return;
+  try{
+    const d = statoAttuale();
+    localStorage.setItem(STORE_KEY, JSON.stringify(d));
+    document.getElementById('save-state').innerHTML = '\uD83D\uDCBE Salvato alle <b style="color:#15803d">' +
+      new Date(d.ts).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) + '</b>';
+  }catch(e){
+    document.getElementById('save-state').innerHTML = '\u26A0\uFE0F Salvataggio bloccato &mdash; usa <b>Esporta</b>';
+  }
+}
+function applicaDati(d){
+  if (!d || !d.v) return 0;
+  let n = 0;
+  Object.keys(d.v).forEach(id => { const e = document.getElementById(id); if (e && !e.readOnly){ e.value = d.v[id]; if (d.v[id]) n++; } });
+  componi();
+  return n;
+}
+function ripristina(){
+  if (!storageOk){
+    document.getElementById('save-state').innerHTML = '\u26A0\uFE0F Salvataggio automatico <b style="color:#9a3412">non disponibile</b>';
+    const w = document.getElementById('warnbox');
+    w.style.display = 'block';
+    w.innerHTML = '<b>Attenzione:</b> aprendo il file dal telefono (tipico su iPhone) il browser blocca la memoria locale: ' +
+                  'i dati non restano alla chiusura. Usa <b>&#11015; Esporta</b> prima di uscire e <b>&#11014; Importa</b> al rientro.';
+    return;
+  }
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch(e){}
+  applicaDati(d);
+}
+function esportaDati(){
+  const d = statoAttuale();
+  const nome = 'segnalazione_' + (g('filiale') || 'filiale') + '_' + (g('data') || oggiISO()) + '.json';
+  try{
+    const b = new Blob([JSON.stringify(d)], {type:'application/json'});
+    const u = URL.createObjectURL(b), a = document.createElement('a');
+    a.href = u; a.download = nome; document.body.appendChild(a); a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(u); }, 1500);
+    avviso('&#11015; Backup creato', 'File <b>' + nome + '</b> salvato sul dispositivo.');
+  }catch(e){ avviso('&#11015; Backup non riuscito', 'Copia il messaggio prima di chiudere la pagina.'); }
+}
+function importaDati(input){
+  const f = input.files && input.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    let d = null;
+    try { d = JSON.parse(r.result); } catch(e){}
+    if (!d || !d.v) avviso('&#9888;&#65039; File non valido', 'Non è un backup di questa pagina.');
+    else { const n = applicaDati(d); salvaDifferito(); avviso('&#11014; Dati importati', 'Ripristinati <b>' + n + '</b> campi.'); }
+    input.value = '';
+  };
+  r.readAsText(f);
+}
+function nuovoGiorno(){
+  apriModal('&#128465; Nuovo giorno',
+    'Vuoi svuotare tutti i campi? Codice e nome filiale restano.',
+    [
+      {label:'Sì, svuota', cls:'m-warn', fn: () => {
+        const c = g('filiale'), n = g('nomefil');
+        campi().forEach(e => e.value = '');
+        document.getElementById('filiale').value = c;
+        document.getElementById('nomefil').value = n;
+        document.getElementById('data').value = oggiISO();
+        try { localStorage.removeItem(STORE_KEY); } catch(e){}
+        componi();
+        window.scrollTo({top:0, behavior:'smooth'});
+      }},
+      {label:'Annulla', cls:'m-ghost'}
+    ]);
+}
+
+/* ---------- AVVIO ---------- */
+try{
+  document.addEventListener('input',  e => { if (e.target && e.target.id !== 'out') componi(); });
+  document.addEventListener('change', e => { if (e.target && e.target.id !== 'out') componi(); });
+  window.addEventListener('beforeunload', salva);
+  ripristina();
+  componi();
+}catch(e){
+  const b = document.createElement('div');
+  b.className = 'warnbox';
+  b.innerHTML = '<b>Errore di avvio:</b> ' + String((e && e.message) || e);
+  document.body.appendChild(b);
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+</script>
+</body>
+</html>

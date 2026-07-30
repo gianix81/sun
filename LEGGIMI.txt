@@ -1,0 +1,73 @@
+SOLE 365 - STRUMENTI FILIALE
+
+IL PROBLEMA DELL'IPHONE
+Un file .html salvato nel telefono viene aperto in anteprima (Quick Look):
+mostra la pagina ma BLOCCA JavaScript. Quindi si compila, ma non si vedono
+contatori, messaggi precompilati, salvataggio o PDF. Non e' un difetto della
+pagina: e' una restrizione di iOS. Su Android Chrome apre davvero il file e
+funziona tutto.
+
+TRE SOLUZIONI, DALLA PIU' VELOCE
+
+1) APP GRATUITA CHE ESEGUE JAVASCRIPT  (nessun sito da creare)
+   Installa "Documents" di Readdle dall'App Store (gratis).
+   Sposta dentro Documents il file .html e aprilo da li'.
+   Il browser interno esegue JavaScript: tutto funziona, salvataggio compreso.
+
+2) METTERE LE PAGINE ONLINE  (soluzione definitiva, gratuita)
+   Da computer apri  https://app.netlify.com/drop
+   Trascina dentro la cartella "sito" (quella con index.html).
+   Ottieni un indirizzo tipo  https://nome-a-caso.netlify.app
+   Aprilo su iPhone con Safari, poi Condividi > Aggiungi alla schermata Home:
+   diventa un'icona come una vera app e funziona anche senza rete.
+   In alternativa GitHub Pages: repository pubblico, carica i file,
+   Settings > Pages > Branch main / root > Save.
+
+3) USARE LA PAGINA COSI' COM'E' IN ANTEPRIMA  (ripiego, senza installare nulla)
+   Anche con JavaScript bloccato restano attive queste cose:
+   - Check list: si compila normalmente, i pulsanti SI/NO/N.P. si colorano e in
+     fondo alla pagina il riquadro "Conteggio totale" si aggiorna da solo
+     (e' fatto in CSS puro). Si puo' anche stampare in PDF con
+     Condividi > Stampa > allarga l'anteprima > Condividi > Salva su File.
+   - Segnalazione: in fondo apri "Modalita' senza JavaScript": trovi lo schema
+     del messaggio gia' pronto, sostituisci i puntini e premi il pulsante verde
+     per aprire WhatsApp con quel testo.
+
+FILE CONTENUTI
+  index.html          menu con i due strumenti
+  checklist.html      check list qualita' e reparti (292 voci)
+  segnalazione.html   segnalazione giornaliera per il gruppo
+  manifest.json       dati per l'installazione sulla schermata Home
+  icona.svg           icona dell'app
+  sw.js               funzionamento senza rete
+
+
+---------------------------------------------------------------
+PUBBLICAZIONE SU VERCEL  (errore 404: NOT_FOUND)
+---------------------------------------------------------------
+Il 404 compare quando i file finiscono dentro una sottocartella:
+alla radice del dominio non c'e' nessun index.html.
+
+RIMEDIO IMMEDIATO
+Aggiungi il nome della cartella all'indirizzo, per esempio:
+   https://tuo-progetto.vercel.app/sito/
+
+SOLUZIONE CORRETTA
+Ricarica il progetto usando QUESTI file, che stanno gia' alla radice:
+index.html deve trovarsi al primo livello, non dentro una cartella.
+
+Se carichi da interfaccia web (vercel.com/new):
+ - trascina la CARTELLA (non lo zip), oppure apri lo zip e trascina i file
+ - Framework Preset: Other
+ - Build Command: lascialo vuoto
+ - Output Directory: lascialo vuoto (oppure un punto:  . )
+ - Root Directory:  ./
+
+Se carichi da GitHub:
+ - i file devono stare nella radice del repository, non in una sottocartella
+ - se sono in una sottocartella, in Vercel imposta Root Directory con
+   il nome di quella cartella
+
+VERIFICA
+Aperto l'indirizzo devi vedere il menu con i due riquadri
+"Check List Qualita' & Reparti" e "Segnalazione Giornaliera".
