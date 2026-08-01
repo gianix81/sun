@@ -74,8 +74,14 @@ input,select,textarea{
 }
 select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%23475569' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand-500);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.14)}
-.riga-scarico{display:grid;grid-template-columns:1fr 108px;gap:8px;align-items:end;margin-bottom:10px}
+
+/* SCARICHI */
+.scarico-item{padding:12px;border:1px solid var(--line);border-radius:12px;background:#fbfcfe;margin-bottom:12px}
+.riga-scarico{display:grid;grid-template-columns:1fr 108px;gap:8px;align-items:end}
 .riga-scarico label{margin-bottom:6px}
+.fascia-wrap{margin-top:10px;display:none}
+.fascia-wrap.show{display:block}
+.fascia-hint{font-size:11px;font-weight:600;color:var(--warn);text-transform:none;letter-spacing:0;margin-bottom:6px;display:block}
 
 details.opz{border-top:1px solid var(--line)}
 details.opz summary{
@@ -126,7 +132,6 @@ textarea.out{height:230px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;ba
 .fallback .fb-body{padding:16px}
 .fallback p{margin:0 0 12px;font-size:12.5px;line-height:1.6;color:var(--ink-soft)}
 .fallback textarea{height:300px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace}
-.fallback button{width:100%;margin-top:12px;padding:14px;border:none;border-radius:10px;background:#16a34a;color:#fff;font-size:14.5px;font-weight:700;cursor:pointer}
 .credit{text-align:center;font-size:7.5px;letter-spacing:.3px;color:#cbd2dc;margin-top:18px;user-select:none}
 
 @media print{
@@ -145,9 +150,9 @@ textarea.out{height:230px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;ba
 
   <div class="hero">
     <div class="hero-inner">
-      <span class="badge-ver">Segnalazione &middot; v2</span>
+      <span class="badge-ver">Segnalazione &middot; v3</span>
       <h1>Segnalazione Giornaliera</h1>
-      <p>Compila i campi: la pagina prepara un unico messaggio con tutte le voci richieste dal Capo Area.</p>
+      <p>Fotografia della filiale nel momento indicato. Ci&ograve; che non &egrave; ancora avvenuto in questa fascia va segnato come tale: &egrave; regolare, non un&rsquo;anomalia.</p>
     </div>
   </div>
 
@@ -166,9 +171,9 @@ textarea.out{height:230px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;ba
     </div>
   </div>
 
-  <!-- FILIALE -->
+  <!-- FILIALE + MOMENTO -->
   <section class="card">
-    <header class="card-head"><span class="n">&#9679;</span><h2>Filiale</h2></header>
+    <header class="card-head"><span class="n">&#9679;</span><h2>Filiale e momento</h2></header>
     <div class="card-body">
       <div class="grid">
         <div>
@@ -193,13 +198,27 @@ textarea.out{height:230px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;ba
           <label for="nomefil">Nome</label>
           <input type="text" id="nomefil" placeholder="Figliola">
         </div>
+        <div>
+          <label for="seg-fascia">Fascia</label>
+          <select id="seg-fascia">
+            <option value="">—</option>
+            <option>Notte</option>
+            <option>Mattina</option>
+            <option>Pomeriggio</option>
+            <option>Sera</option>
+          </select>
+        </div>
+        <div>
+          <label for="seg-ora">Ora rilevazione</label>
+          <input type="time" id="seg-ora">
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 1 MATTINO -->
+  <!-- 1 SITUAZIONE ATTUALE -->
   <section class="card">
-    <header class="card-head"><span class="n">1</span><h2>Situazione al mattino</h2></header>
+    <header class="card-head"><span class="n">1</span><h2>Situazione attuale</h2></header>
     <div class="card-body">
       <div class="grid">
         <div>
@@ -212,8 +231,9 @@ textarea.out{height:230px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;ba
           <select id="m-stato">
             <option value="">—</option>
             <option value="ha terminato ed è uscita dal punto vendita">ha terminato ed è uscita</option>
-            <option value="è ancora in filiale">è ancora in filiale</option>
+            <option value="è ancora in filiale">è ancora in filiale (regolare)</option>
             <option value="sta lasciando il punto vendita">sta uscendo</option>
+            <option value="non prevista in questa fascia">non prevista in questa fascia</option>
             <option value="non è presente">non è presente</option>
           </select>
         </div>
@@ -228,6 +248,7 @@ textarea.out{height:230px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;ba
             <option>completati</option>
             <option>in corso</option>
             <option>da completare</option>
+            <option value="non ancora iniziati (regolare per la fascia)">non ancora iniziati (regolare)</option>
           </select>
         </div>
         <div>
@@ -235,8 +256,8 @@ textarea.out{height:230px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;ba
           <input type="number" id="m-pedane" min="0" inputmode="numeric" placeholder="0">
         </div>
         <div>
-          <label for="m-disserv">Disservizi notte</label>
-          <select id="m-disserv"><option value="">—</option><option value="no">nessuno</option><option value="si">sì</option></select>
+          <label for="m-disserv">Disservizi provider notte</label>
+          <select id="m-disserv"><option value="">—</option><option value="no">nessuno</option><option value="si">sì</option><option value="na">non applicabile</option></select>
         </div>
         <div class="wide">
           <label for="m-note">Note</label>
@@ -250,27 +271,49 @@ textarea.out{height:230px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;ba
   <section class="card">
     <header class="card-head"><span class="n">2</span><h2>Scarichi</h2></header>
     <div class="card-body">
-      <div class="riga-scarico">
-        <div>
-          <label for="s-secchi">Secchi</label>
-          <select id="s-secchi"><option value="">—</option><option>ricevuto</option><option>parziale</option><option>in attesa</option><option>non pervenuto</option></select>
+
+      <div class="scarico-item">
+        <div class="riga-scarico">
+          <div>
+            <label for="s-secchi">Secchi</label>
+            <select id="s-secchi"><option value="">—</option><option>ricevuto</option><option>parziale</option><option>in attesa</option><option>non pervenuto</option></select>
+          </div>
+          <div><label for="s-secchi-ora">Ora</label><input type="time" id="s-secchi-ora"></div>
         </div>
-        <div><label for="s-secchi-ora">Ora</label><input type="time" id="s-secchi-ora"></div>
-      </div>
-      <div class="riga-scarico">
-        <div>
-          <label for="s-freschi">Freschi</label>
-          <select id="s-freschi"><option value="">—</option><option>ricevuto</option><option>parziale</option><option>in attesa</option><option>non pervenuto</option></select>
+        <div class="fascia-wrap" id="w-s-secchi-fascia">
+          <label class="fascia-hint" for="s-secchi-fascia">In quale fascia è previsto</label>
+          <select id="s-secchi-fascia"><option value="">—</option><option>Notte</option><option>Mattina</option><option>Pomeriggio</option><option>Sera</option></select>
         </div>
-        <div><label for="s-freschi-ora">Ora</label><input type="time" id="s-freschi-ora"></div>
       </div>
-      <div class="riga-scarico">
-        <div>
-          <label for="s-surg">Surgelati</label>
-          <select id="s-surg"><option value="">—</option><option>ricevuto</option><option>parziale</option><option>in attesa</option><option>non pervenuto</option></select>
+
+      <div class="scarico-item">
+        <div class="riga-scarico">
+          <div>
+            <label for="s-freschi">Freschi</label>
+            <select id="s-freschi"><option value="">—</option><option>ricevuto</option><option>parziale</option><option>in attesa</option><option>non pervenuto</option></select>
+          </div>
+          <div><label for="s-freschi-ora">Ora</label><input type="time" id="s-freschi-ora"></div>
         </div>
-        <div><label for="s-surg-ora">Ora</label><input type="time" id="s-surg-ora"></div>
+        <div class="fascia-wrap" id="w-s-freschi-fascia">
+          <label class="fascia-hint" for="s-freschi-fascia">In quale fascia è previsto</label>
+          <select id="s-freschi-fascia"><option value="">—</option><option>Notte</option><option>Mattina</option><option>Pomeriggio</option><option>Sera</option></select>
+        </div>
       </div>
+
+      <div class="scarico-item">
+        <div class="riga-scarico">
+          <div>
+            <label for="s-surg">Surgelati</label>
+            <select id="s-surg"><option value="">—</option><option>ricevuto</option><option>parziale</option><option>in attesa</option><option>non pervenuto</option></select>
+          </div>
+          <div><label for="s-surg-ora">Ora</label><input type="time" id="s-surg-ora"></div>
+        </div>
+        <div class="fascia-wrap" id="w-s-surg-fascia">
+          <label class="fascia-hint" for="s-surg-fascia">In quale fascia è previsto</label>
+          <select id="s-surg-fascia"><option value="">—</option><option>Notte</option><option>Mattina</option><option>Pomeriggio</option><option>Sera</option></select>
+        </div>
+      </div>
+
       <div>
         <label for="s-note">Anomalie</label>
         <input type="text" id="s-note" placeholder="Es. secondo camion arrivato alle 2, fuori orario">
@@ -309,7 +352,7 @@ textarea.out{height:230px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;ba
       <div class="grid">
         <div>
           <label for="f-stato">Stato</label>
-          <select id="f-stato"><option value="">—</option><option>ok</option><option>da completare</option><option>non compilato</option></select>
+          <select id="f-stato"><option value="">—</option><option>ok</option><option>da completare</option><option value="non ancora disponibile in questa fascia">non ancora disponibile (regolare)</option><option>non compilato</option></select>
         </div>
       </div>
     </div>
@@ -366,15 +409,15 @@ textarea.out{height:230px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;ba
   <details class="rules">
     <summary>&#128220; Cosa chiede il Capo Area</summary>
     <div class="rules-body">
-      Ogni filiale <b>copia il messaggio della precedente e incolla il proprio sotto</b>, con il puntino iniziale che identifica la filiale.
+      La segnalazione &egrave; la <b>fotografia della filiale nel momento indicato</b> (fascia + ora). Ogni filiale <b>copia il messaggio della precedente e incolla il proprio sotto</b>, con il puntino iniziale che identifica la filiale.
       <ol>
-        <li><b>Situazione al mattino</b>: disservizi provider nella notte e stato della filiale dopo il commissionamento.</li>
-        <li><b>Scarichi</b>: secchi, freschi e surgelati ricevuti.</li>
+        <li><b>Situazione attuale</b>: stato della ditta e del commissionamento in questo momento; eventuali disservizi provider nella notte.</li>
+        <li><b>Scarichi</b>: secchi, freschi e surgelati. Se un rifornimento non &egrave; ancora arrivato, si indica la <b>fascia in cui &egrave; atteso</b> &mdash; &egrave; regolare, non un&rsquo;anomalia.</li>
         <li><b>Colli di resa</b>.</li>
-        <li><b>Ordini integrati</b> compresi FB e acqua, con i colli d'acqua tra parentesi.</li>
+        <li><b>Ordini integrati</b> compresi FB e acqua, con i colli d&rsquo;acqua tra parentesi.</li>
         <li><b>File riempimento mezzi</b>.</li>
       </ol>
-      Il prospetto colli ordini (sala, BLS e surgelati distinti fra ASR e manuale) va inviato solo quando richiesto.
+      Ci&ograve; che in quella fascia non &egrave; ancora avvenuto va segnato come <b>&ldquo;non ancora / non previsto in questa fascia&rdquo;</b>, per distinguere il normale dal mancante. Il prospetto colli ordini (sala, BLS e surgelati distinti fra ASR e manuale) va inviato solo quando richiesto.
     </div>
   </details>
 
@@ -385,12 +428,12 @@ textarea.out{height:230px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;ba
       Qui sotto trovi lo <b>schema già pronto</b>: sostituisci i puntini con i tuoi dati, poi premi il pulsante verde.
       Questo riquadro funziona <b>anche senza JavaScript</b>.</p>
       <form action="https://api.whatsapp.com/send" method="get" target="_blank">
-        <textarea name="text">&#8226; Filiale ...... — ../..
-1. Mattino: ditta ...... ha terminato / è ancora in filiale alle ......, caricamento e allineamento completati / in corso, nessun disservizio provider nella notte.
-2. Scarichi: secchi ...... ore ......; freschi ...... ore ......; surgelati ...... ore ......
+        <textarea name="text">&#8226; Filiale ...... — ../.. · fascia ...... ore ......
+1. Situazione attuale: ditta ...... è ancora in filiale / ha terminato alle ......, caricamento e allineamento in corso / non ancora iniziati, nessun disservizio provider nella notte.
+2. Scarichi: secchi ...... ore ......; freschi in attesa, previsti in fascia ......; surgelati ...... ore ......
 3. Resa: sala ...... , BLS ...... , surgelati ...... — totale ...... colli.
 4. Ordini integrati: ...... colli, di cui FB ...... e acqua (...... colli).
-5. File riempimento mezzi: ok.</textarea>
+5. File riempimento mezzi: ok / non ancora disponibile in questa fascia.</textarea>
         <button type="submit">&#128172; Apri WhatsApp con questo testo</button>
       </form>
     </div>
@@ -410,19 +453,39 @@ textarea.out{height:230px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;ba
 <script>
 function g(id){ const e = document.getElementById(id); return e ? String(e.value).trim() : ''; }
 function oggiISO(){ const d = new Date(), p = n => (n < 10 ? '0' : '') + n; return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+function oraAdesso(){ const d = new Date(), p = n => (n < 10 ? '0' : '') + n; return p(d.getHours())+':'+p(d.getMinutes()); }
 function ora(id){ const v = g(id); return v ? v.replace(':', '.') : ''; }
 function dataIT(){
   const v = g('data'); if (!v) return '';
   const p = v.split('-'); return p.length === 3 ? p[2]+'/'+p[1] : v;
 }
+function low(s){ return s ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
 try { document.getElementById('data').value = oggiISO(); } catch(e){}
+try { if(!g('seg-ora')) document.getElementById('seg-ora').value = oraAdesso(); } catch(e){}
+
+/* mostra il selettore "fascia prevista" solo se lo scarico non è ancora arrivato */
+function aggiornaFasce(){
+  [['s-secchi','w-s-secchi-fascia'],['s-freschi','w-s-freschi-fascia'],['s-surg','w-s-surg-fascia']]
+    .forEach(x => {
+      const st = g(x[0]);
+      const attesa = (st === 'in attesa' || st === 'non pervenuto');
+      const w = document.getElementById(x[1]);
+      if (w) w.classList.toggle('show', attesa);
+    });
+}
 
 /* ---------- MESSAGGIO UNICO ---------- */
 function testoMio(){
   const cod = g('filiale'), nome = g('nomefil'), d = dataIT();
-  const r = ['• Filiale ' + ((cod + ' ' + nome).trim() || '___') + (d ? ' — ' + d : '')];
+  const fascia = g('seg-fascia'), oraSeg = ora('seg-ora');
+  let head = '• Filiale ' + ((cod + ' ' + nome).trim() || '___') + (d ? ' — ' + d : '');
+  const mom = [];
+  if (fascia) mom.push('fascia ' + low(fascia));
+  if (oraSeg) mom.push('ore ' + oraSeg);
+  if (mom.length) head += ' · ' + mom.join(' ');
+  const r = [head];
 
-  /* 1 mattino */
+  /* 1 situazione attuale */
   const p1 = [];
   const ditta = g('m-ditta'), stato = g('m-stato'), o = ora('m-ora');
   if (ditta || stato) p1.push((ditta || 'Ditta') + (stato ? ' ' + stato : '') + (o ? ' alle ' + o : ''));
@@ -433,12 +496,21 @@ function testoMio(){
   if (dis === 'no') p1.push('nessun disservizio provider nella notte');
   if (dis === 'si') p1.push('disservizio provider nella notte');
   if (g('m-note'))  p1.push(g('m-note'));
-  r.push('1. Mattino: ' + (p1.length ? p1.join(', ') + '.' : '—'));
+  r.push('1. Situazione attuale: ' + (p1.length ? p1.join(', ') + '.' : '—'));
 
-  /* 2 scarichi */
+  /* 2 scarichi (stato + fascia prevista) */
   const p2 = [];
-  [['secchi','s-secchi','s-secchi-ora'],['freschi','s-freschi','s-freschi-ora'],['surgelati','s-surg','s-surg-ora']]
-    .forEach(x => { const st = g(x[1]); if (st) p2.push(x[0] + ' ' + st + (ora(x[2]) ? ' ore ' + ora(x[2]) : '')); });
+  [['secchi','s-secchi','s-secchi-ora','s-secchi-fascia'],
+   ['freschi','s-freschi','s-freschi-ora','s-freschi-fascia'],
+   ['surgelati','s-surg','s-surg-ora','s-surg-fascia']]
+    .forEach(x => {
+      const st = g(x[1]); if (!st) return;
+      const orario = ora(x[2]), fp = g(x[3]), nome = x[0];
+      if (st === 'ricevuto')       p2.push(nome + ' ricevuti' + (orario ? ' ore ' + orario : ''));
+      else if (st === 'parziale')  p2.push(nome + ' ricevuti parzialmente' + (orario ? ' ore ' + orario : ''));
+      else if (st === 'in attesa') p2.push(nome + ' in attesa' + (fp ? ', previsti in fascia ' + low(fp) : ''));
+      else if (st === 'non pervenuto') p2.push(nome + ' non pervenuti' + (fp ? ' (erano attesi in fascia ' + low(fp) + ')' : ''));
+    });
   if (g('s-note')) p2.push(g('s-note'));
   r.push('2. Scarichi: ' + (p2.length ? p2.join('; ') + '.' : '—'));
 
@@ -489,17 +561,14 @@ function testoCompleto(){
 }
 
 function componi(){
+  aggiornaFasce();
   document.getElementById('out').value = testoCompleto();
   const mancano = [];
   if (!g('filiale') && !g('nomefil')) mancano.push('filiale');
-  if (!g('m-ditta') && !g('m-stato') && !g('m-lavori')) mancano.push('mattino');
-  if (!g('s-secchi') && !g('s-freschi') && !g('s-surg')) mancano.push('scarichi');
-  if (g('r-sala') === '' && g('r-bls') === '' && g('r-surg') === '') mancano.push('resa');
-  if (g('i-tot') === '' && g('i-acqua') === '') mancano.push('integrati');
-  if (!g('f-stato')) mancano.push('mezzi');
+  if (!g('seg-fascia')) mancano.push('fascia');
   const st = document.getElementById('stato');
-  if (!mancano.length){ st.innerHTML = '&#9989; Messaggio pronto'; st.style.color = '#15803d'; }
-  else { st.textContent = 'Da compilare: ' + mancano.join(', '); st.style.color = '#c2410c'; }
+  if (!mancano.length){ st.innerHTML = '&#9989; Fotografia pronta'; st.style.color = '#15803d'; }
+  else { st.textContent = 'Da indicare: ' + mancano.join(', '); st.style.color = '#c2410c'; }
   salvaDifferito();
 }
 
@@ -554,10 +623,10 @@ function salva(){
   try{
     const d = statoAttuale();
     localStorage.setItem(STORE_KEY, JSON.stringify(d));
-    document.getElementById('save-state').innerHTML = '\uD83D\uDCBE Salvato alle <b style="color:#15803d">' +
+    document.getElementById('save-state').innerHTML = '💾 Salvato alle <b style="color:#15803d">' +
       new Date(d.ts).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) + '</b>';
   }catch(e){
-    document.getElementById('save-state').innerHTML = '\u26A0\uFE0F Salvataggio bloccato &mdash; usa <b>Esporta</b>';
+    document.getElementById('save-state').innerHTML = '⚠️ Salvataggio bloccato &mdash; usa <b>Esporta</b>';
   }
 }
 function applicaDati(d){
@@ -569,7 +638,7 @@ function applicaDati(d){
 }
 function ripristina(){
   if (!storageOk){
-    document.getElementById('save-state').innerHTML = '\u26A0\uFE0F Salvataggio automatico <b style="color:#9a3412">non disponibile</b>';
+    document.getElementById('save-state').innerHTML = '⚠️ Salvataggio automatico <b style="color:#9a3412">non disponibile</b>';
     const w = document.getElementById('warnbox');
     w.style.display = 'block';
     w.innerHTML = '<b>Attenzione:</b> aprendo il file dal telefono (tipico su iPhone) il browser blocca la memoria locale: ' +
@@ -614,6 +683,7 @@ function nuovoGiorno(){
         document.getElementById('filiale').value = c;
         document.getElementById('nomefil').value = n;
         document.getElementById('data').value = oggiISO();
+        try { document.getElementById('seg-ora').value = oraAdesso(); } catch(e){}
         try { localStorage.removeItem(STORE_KEY); } catch(e){}
         componi();
         window.scrollTo({top:0, behavior:'smooth'});
