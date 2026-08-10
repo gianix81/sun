@@ -1,8 +1,8 @@
 /* Sole 365 – service worker sicuro
    Regola: non deve MAI rispondere con "undefined", altrimenti il browser
    restituisce ERR_FAILED. Strategia: prima la rete, la cache solo come riserva. */
-var CACHE = 'sole365-v2';
-var FILE = ['./', 'index.html', 'checklist.html', 'segnalazione.html', 'manifest.json', 'icona.svg'];
+var CACHE = 'sole365-v3';
+var FILE = ['./', 'index.html', 'checklist.html', 'segnalazione.html', 'distrutti.html', 'manifest.json', 'icona.svg'];
 
 self.addEventListener('install', function(e){
   self.skipWaiting();
