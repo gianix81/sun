@@ -179,14 +179,15 @@ function parse(bytes,fname){
   const wb=XLSX.read(bytes,{sheets:[repN,dbN,evoN].filter(Boolean),dense:true});
   const grid=n=>XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,raw:true,defval:null});
   DATA=build(grid(repN),wb.Sheets[dbN],evoN?grid(evoN):null);
-  if(!DATA){setStatus('Struttura del foglio non riconosciuta.','err',false);return;}
+  if(!DATA){setStatus(LASTERR||'Struttura del foglio non riconosciuta.','err',false);return;}
   initUI(fname);
 }
 function num(v){return typeof v==='number'?v:(v==null?null:(isNaN(parseFloat(v))?null:parseFloat(v)));}
-function build(R,dbWS,E){
+let LASTERR='';
+function build(R,dbWS,E){LASTERR='';
   let hr=-1;for(let i=0;i<R.length;i++){if(R[i]&&R[i].some(c=>c==='GASTRONOMIA')){hr=i;break;}}
-  if(hr<0)return null;
-  const H=R[hr],idx=n=>H.indexOf(n);const gI=idx('GASTRONOMIA'),nameCol=H.indexOf('PV'),codeCol=nameCol-1,totCol=gI-1;
+  if(hr<0){LASTERR="Nel foglio incidenza non trovo l'intestazione dei reparti (es. GASTRONOMIA). Verifica di aver caricato il file Distrutti giusto.";return null;}
+  const H=R[hr],idx=n=>H.indexOf(n);const _nz=s=>String(s==null?'':s).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/gi,'').toLowerCase();const gI=idx('GASTRONOMIA');let nameCol=H.indexOf('PV');if(nameCol<0)nameCol=H.findIndex(c=>_nz(c)==='pv');if(nameCol<0)nameCol=H.findIndex(c=>_nz(c)==='pdv'||_nz(c)==='puntovendita');const codeCol=nameCol-1,totCol=gI-1;
   const dcol={};DKEYS.forEach(k=>dcol[k]=idx(k));
   let week=null,period=null;
   for(let i=0;i<hr;i++){const row=R[i]||[];for(let j=0;j<row.length;j++){const c=row[j];
@@ -197,10 +198,11 @@ function build(R,dbWS,E){
     if(nm==='TOTALE'){rete.totale=num(row[totCol]);DKEYS.forEach(k=>rete[k]=num(row[dcol[k]]));continue;}
     const code=row[codeCol];
     if(typeof code==='number'&&nm){const o={code,name:nm,inc:{totale:num(row[totCol])}};DKEYS.forEach(k=>o.inc[k]=num(row[dcol[k]]));o.mov={D:0,A:0,F:0};o.deps={};pdvs.push(o);byCode[code]=o;}}
+  if(!pdvs.length){LASTERR="Nel foglio incidenza non ho trovato righe PdV valide (colonna PV).";return null;}
   // DB distrutti (dense: ws[i] arrays of cells)
   const ref=dbWS['!ref'];const rng=XLSX.utils.decode_range(ref);const NR=rng.e.r;
-  const DH=(dbWS[0]||[]).map(c=>c?c.v:null);const _norm=s=>String(s==null?'':s).trim().toLowerCase();const _DHn=DH.map(_norm);const dci=n=>_DHn.indexOf(_norm(n));const dciAny=(...ns)=>{for(const n of ns){const k=dci(n);if(k>=0)return k;}return -1;};
-  const cPV=dciAny('Cod.PV','Cod.Pdv','Cod. Pdv','Cod. PV','CodPdv','Cod.PDV'),cDep=dci('DesLiv1'),cTD=dci('Des. Tipo Documento'),cArt=dci('Des. Articolo'),cUm=dci('U.m'),cQ=dci('Quantita'),cVal=dci('Valore a Costo Totale');
+  const DH=(dbWS[0]||[]).map(c=>c?c.v:null);const _norm=s=>String(s==null?'':s).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/gi,' ').trim().toLowerCase();const _DHn=DH.map(_norm);const dci=n=>_DHn.indexOf(_norm(n));const dciAny=(...ns)=>{for(const n of ns){const k=dci(n);if(k>=0)return k;}return -1;};const dciKw=(...kw)=>{const ks=kw.map(_norm);for(let j=0;j<_DHn.length;j++){if(_DHn[j]&&ks.every(k=>_DHn[j].includes(k)))return j;}return -1;};
+  let cPV=dciAny('Cod.PV','Cod.Pdv','Cod PV','Codice PV','Codice Pdv','Cod Punto Vendita');if(cPV<0)cPV=dciKw('cod','pdv');if(cPV<0)cPV=dciKw('cod','pv');if(cPV<0)cPV=dciKw('codice','punto','vendita');let cTD=dciAny('Des. Tipo Documento','Tipo Documento','Descrizione Tipo Documento');if(cTD<0)cTD=dciKw('tipo','documento');let cVal=dciAny('Valore a Costo Totale','Valore Costo Totale','Costo Totale');if(cVal<0)cVal=dciKw('valore','costo','totale');if(cVal<0)cVal=dciKw('costo','totale');let cDep=dciAny('DesLiv1','Descrizione Liv1');if(cDep<0)cDep=dciKw('des','liv1');let cArt=dciAny('Des. Articolo','Descrizione Articolo','Articolo');if(cArt<0)cArt=dciKw('des','articolo');let cUm=dciAny('U.m','UM','Unita di misura','Unità di misura');if(cUm<0)cUm=dciKw('unita','misura');let cQ=dciAny('Quantita','Quantità','Qta');if(cQ<0)cQ=dciKw('quantit');if(cPV<0||cTD<0||cVal<0){LASTERR="Nel foglio 'DB distrutti' non riconosco: "+[cPV<0?'Codice PdV':null,cTD<0?'Tipo Documento':null,cVal<0?'Valore a Costo Totale':null].filter(Boolean).join(', ')+". Intestazioni trovate: "+DH.filter(Boolean).join(' · ');return null;}
   function cat(td){if(!td)return null;if(td.indexOf('DISTRUZIONE')>=0)return 'D';if(td.indexOf('AUTOCONSUMI')>=0)return 'A';if(td.indexOf('MANCATO')>=0)return 'F';return null;}
   for(let i=1;i<=NR;i++){const row=dbWS[i];if(!row)continue;const pc=row[cPV];if(!pc||pc.v==null)continue;
     const tc=row[cTD];const c=cat(tc&&tc.v);if(!c)continue;const P=byCode[pc.v];if(!P)continue;
