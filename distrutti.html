@@ -199,8 +199,8 @@ function build(R,dbWS,E){
     if(typeof code==='number'&&nm){const o={code,name:nm,inc:{totale:num(row[totCol])}};DKEYS.forEach(k=>o.inc[k]=num(row[dcol[k]]));o.mov={D:0,A:0,F:0};o.deps={};pdvs.push(o);byCode[code]=o;}}
   // DB distrutti (dense: ws[i] arrays of cells)
   const ref=dbWS['!ref'];const rng=XLSX.utils.decode_range(ref);const NR=rng.e.r;
-  const DH=(dbWS[0]||[]).map(c=>c?c.v:null);const dci=n=>DH.indexOf(n);
-  const cPV=dci('Cod.PV'),cDep=dci('DesLiv1'),cTD=dci('Des. Tipo Documento'),cArt=dci('Des. Articolo'),cUm=dci('U.m'),cQ=dci('Quantita'),cVal=dci('Valore a Costo Totale');
+  const DH=(dbWS[0]||[]).map(c=>c?c.v:null);const _norm=s=>String(s==null?'':s).trim().toLowerCase();const _DHn=DH.map(_norm);const dci=n=>_DHn.indexOf(_norm(n));const dciAny=(...ns)=>{for(const n of ns){const k=dci(n);if(k>=0)return k;}return -1;};
+  const cPV=dciAny('Cod.PV','Cod.Pdv','Cod. Pdv','Cod. PV','CodPdv','Cod.PDV'),cDep=dci('DesLiv1'),cTD=dci('Des. Tipo Documento'),cArt=dci('Des. Articolo'),cUm=dci('U.m'),cQ=dci('Quantita'),cVal=dci('Valore a Costo Totale');
   function cat(td){if(!td)return null;if(td.indexOf('DISTRUZIONE')>=0)return 'D';if(td.indexOf('AUTOCONSUMI')>=0)return 'A';if(td.indexOf('MANCATO')>=0)return 'F';return null;}
   for(let i=1;i<=NR;i++){const row=dbWS[i];if(!row)continue;const pc=row[cPV];if(!pc||pc.v==null)continue;
     const tc=row[cTD];const c=cat(tc&&tc.v);if(!c)continue;const P=byCode[pc.v];if(!P)continue;
