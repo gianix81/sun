@@ -195,7 +195,7 @@ function build(R,dbWS,E){LASTERR='';
     if(typeof c==='string'&&/\bdal\b.*\bal\b/i.test(c))period=c.trim();}}
   let rete={},pdvs=[],byCode={};
   for(let i=hr+1;i<R.length;i++){const row=R[i];if(!row)continue;const nm=row[nameCol];
-    if(nm==='TOTALE'){rete.totale=num(row[totCol]);DKEYS.forEach(k=>rete[k]=num(row[dcol[k]]));continue;}
+    if(typeof nm==='string'&&(_nz(nm)==='totale'||_nz(nm).indexOf('totalerete')===0)){rete.totale=num(row[totCol]);DKEYS.forEach(k=>rete[k]=num(row[dcol[k]]));continue;}
     const code=row[codeCol];
     if(typeof code==='number'&&nm){const o={code,name:nm,inc:{totale:num(row[totCol])}};DKEYS.forEach(k=>o.inc[k]=num(row[dcol[k]]));o.mov={D:0,A:0,F:0};o.deps={};pdvs.push(o);byCode[code]=o;}}
   if(!pdvs.length){LASTERR="Nel foglio incidenza non ho trovato righe PdV valide (colonna PV).";return null;}
