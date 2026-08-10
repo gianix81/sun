@@ -78,6 +78,14 @@ pre.msg{background:#0b141a;color:#e8eef3;border-radius:12px;padding:14px 15px;fo
 .overlay .t{font-weight:700}.overlay .s{color:var(--muted);font-size:12.5px}
 @media(min-width:640px){.kpis{grid-template-columns:1fr 1fr 1fr}.kpi.wide{grid-column:auto}.actionbar{border-radius:16px 16px 0 0}}
 </style>
+<style id="mobile-vertical">
+@media (max-width: 820px){
+  html, body{ overflow-x:hidden; }
+  .wrap{ max-width:100% !important; }
+  .mov{ grid-template-columns:1fr !important; }
+  [style*="grid-template-columns"]{ grid-template-columns:1fr !important; }
+}
+</style>
 </head>
 <body>
 <div class="wrap">
